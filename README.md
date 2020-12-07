@@ -1,5 +1,5 @@
-# AerolithOnStream
-`A basic Twitch bot that relies on pyautogui to run AerolithOnStream
+# Aerolith On Stream
+A basic Twitch bot that relies on pyautogui to run Aerolith on stream.
 
 ## Files you need on your local version
 
@@ -13,7 +13,7 @@
       
     
 ## Setting up your own bot
-### Instructions adapted from https://github.com/danibarker/TwitchBot. You can run AerolithOnStream.py if you have python, or the exe if you don't
+### Instructions adapted from https://github.com/danibarker/TwitchBot. You can run AerolithOnStream.py if you have python, or the exe if you don't.
 
   	1. Create a new Twitch account with the username you want the bot to have
 
@@ -29,22 +29,18 @@
 
   	7. Click Create
 
-  	8. You will be brought to a page called Console, where you will see your App, click on Manage
-
-  	9. Copy your Client ID, you will need to put this in config.json
-
-  	10. Open config.json and replace the lines with your information, be sure to leave the variables in quotes:
+  	8. Open config.json and replace the lines with your information. Be sure to leave the variables in quotes:
 	  	
 		irc_token is the oauth, make sure it includes the text "oauth:" and not just the rest of the string
 	  	nick is your bot's username
 	  	channel is your stream channel
 
-  	11. Save this file
+  	9. Save this file
 
-  	12. That's it, run TwitchBot.exe or TwitchBot.py and it should connect and show a message saying "it is online"
+  	10. That's it, run aerolithonstream.exe or AerolithOnStream.py and it should connect and show a message saying "Bot has joined <Streamer>'s channel!"
     
-    13. To run TwitchBot.py you will need to have the twitchio package installed, instructions can be found in the readme at https://github.com/TwitchIO/TwitchIO
+    11. You will need to have the pyautogui package installed to run AerolithOnStream.py.
 
-## How to use bot
+## How to use the bot
 
 The bot can be activated with the streamer typing in "!start" (preferably using another device). After this, the bot will type out and enter any stream chat messages sent - so make sure that your cursor is typing into Aerolith before activating it. The bot can be deactivated with the streamer typing in "!end" or closing the program.
