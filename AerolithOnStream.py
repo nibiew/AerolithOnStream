@@ -21,7 +21,7 @@ def runGame():
     global message
     global user
     while True:
-        if message == "!end" and user == config.nick:
+        if message == "!end" and user == config.channel:
             break
         elif message != "":
             try:
@@ -36,7 +36,7 @@ def gameControl():
     global message
     global user
     while True:
-        if message == "!start" and user == config.nick:
+        if message == "!start" and user == config.channel:
             message = ""
             runGame()       
 
