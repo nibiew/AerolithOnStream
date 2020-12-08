@@ -4,12 +4,14 @@ A basic Twitch bot that relies on pyautogui to run Aerolith on stream.
 ## Files you need on your local version
 
   `config.json`
-   This is the configuration file to connect the bot to a Twitch account (fake credentials supplied).
+   This is the configuration file to connect the bot to a Twitch account (fake credentials supplied):
+	```
 	{
 		"irc_token": "oauth:ab2cefg45hika25mntu34dsffsa143v3",
 		"nick": "BotAccount",
 		"channel": "Streamer"
 	}
+	```
       
     
 ## Setting up your own bot
@@ -43,4 +45,6 @@ A basic Twitch bot that relies on pyautogui to run Aerolith on stream.
 
 ## How to use the bot
 
-The bot can be activated with the streamer typing in "!start" (preferably using another device). After this, the bot will type out and enter any stream chat messages sent - so make sure that your cursor is typing into Aerolith before activating it. The bot can be deactivated with the streamer typing in "!end" or closing the program.
+	1. The bot can be activated with the streamer typing in "!start" (preferably using another device). The bot will send the message "Starting Aerolith On Stream!"
+	2. After this, the bot will type out and enter any stream chat messages sent - so make sure that your cursor is typing into Aerolith before activating it. (WARNING: Do not put your cursor in Twitch chat or the logged in account will start spamming!)
+	3. The bot can be deactivated with the streamer typing in "!end" or closing the program. The bot will send the message "Ending Aerolith On Stream!"

@@ -22,6 +22,8 @@ def runGame():
     global user
     while True:
         if message == "!end" and user == config.channel:
+            print("Ending Aerolith On Stream!")
+            sendMessage(irc, "Ending Aerolith On Stream!")
             break
         elif message != "":
             try:
@@ -37,8 +39,14 @@ def gameControl():
     global user
     while True:
         if message == "!start" and user == config.channel:
+            print("Starting Aerolith On Stream!")
+            sendMessage(irc, "Starting Aerolith On Stream!")
             message = ""
             runGame()       
+
+def sendMessage(irc, message):
+    messageTemp = "PRIVMSG #" + config.channel + " :" + message
+    irc.send((messageTemp + "\n").encode())
 
 
 def twitch():
@@ -56,9 +64,6 @@ def twitch():
             return False
         else:
             return True
-    def sendMessage(irc, message):
-        messageTemp = "PRIVMSG #" + config.channel + " :" + message
-        irc.send((messageTemp + "\n").encode())
 
     def getUser(line):
         global user
