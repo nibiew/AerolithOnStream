@@ -1,3 +1,4 @@
+import pyperclip
 import pyautogui
 import socket
 import threading
@@ -27,7 +28,8 @@ def runGame():
             break
         elif message != "":
             try:
-                pyautogui.typewrite(message)
+                pyperclip.copy(message)
+                pyautogui.hotkey('ctrl', 'v')
                 pyautogui.press('enter')
                 message = ""
             except:
