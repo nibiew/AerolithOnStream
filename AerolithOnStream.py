@@ -78,10 +78,10 @@ def twitch():
 def containsAll(string1, string2): #longer string is string1
     for c in string2:
         if c not in string1: return False
-        string1.replace(c, '', 1)
+        string1 = string1.replace(c, '', 1)
     return True
         
-def gameControl(t, alpha, words, blank):
+def gameControl(t, alpha, words, blank, blank_length):
     global message, user, event, window, values, scores, badguess
     endtime = datetime.datetime.now() + datetime.timedelta(seconds = float(t))
     window['-OUTPUT-'].update('Aerolith On Stream has started!', text_color = 'red')
@@ -104,7 +104,7 @@ def gameControl(t, alpha, words, blank):
                 if not sortedMessage in alpha: #wrong letters
                     message = ""
                     continue
-            elif not any(containsAll(sortedMessage, string) for string in alpha): #blank quiz - probably slower
+            elif len(message) != blank_length or not any(containsAll(sortedMessage, string) for string in alpha): #blank quiz - probably slower.
                 message = ""
                 continue
             try:
@@ -203,8 +203,9 @@ while True:
             alpha.append(question['a'])
             words.extend(question['ws'])
         blank = any('?' in string for string in alpha) #checks if this is a blank quiz
+        blank_length = len(alpha[0]) #get length of first alphagram for blank quizzes
         alpha = [s.replace('?', '') for s in alpha]
-        t2 = threading.Thread(target = gameControl, args=(time,alpha,words,blank,))
+        t2 = threading.Thread(target = gameControl, args=(time,alpha,words,blank,blank_length,))
         t2.start()
 # Finish up by removing from the screen
 window.close()
