@@ -1,5 +1,8 @@
 {
 	"irc_token": "oauth:ab2cefg45hika25mntu34dsffsa143v3",
 	"nick": "BotAccount",
-    "channel": "Streamer"
+    "channel": "Streamer",
+	"theme": "Dark Black",
+	"font": "Arial",
+	"colours": ["yellow", "black", "sandy brown"]
 }
