@@ -12,7 +12,8 @@ A basic Twitch bot that relies on PyAutoGUI to run Aerolith (https://www.aerolit
 			"channel": "Streamer",
 			"theme": "Dark Black",
 			"font": "Arial",
-			"colours": ["yellow", "black", "sandy brown"]
+			"colours": ["yellow", "black", "sandy brown"],
+			"box_height": [25, 5, 5]
 		}
     
 ### Setting up your own bot
@@ -30,6 +31,7 @@ Instructions adapted from https://github.com/danibarker/TwitchBot. You can run A
 		theme is your preferred theme (default is Dark Black - you can select your favourite at https://pysimplegui.readthedocs.io/en/latest/cookbook/#themes-window-beautification)
 		font is your preferred font
 		colours are your preferred three colours for the top three positions - you may refer to https://github.com/PySimpleGUI/PySimpleGUI/blob/master/DemoPrograms/Demo_Color_Names_Smaller_List.py for colour names or use hex codes
+		box_height are your preferred number of rows to show for guesses, correct and wrong answers.
 
   	4. That's it, run AerolithOnStream.exe or AerolithOnStream.py and you should see a message on the console saying "Bot <Bot's nick> has joined the channel <Streamer>!"
     
@@ -47,7 +49,7 @@ Instructions adapted from https://github.com/danibarker/TwitchBot. You can run A
 	
 	5. The bot will only send guesses if the letters in the stream message match one of the words in the quiz.
 	
-	6. The bot will automatically deactivate when the quiz timer has expired. You can also manually deactivate it by typing in "!end" (streamer only) or clicking on "End" in the program. If so, the bot will send the message "Ending Aerolith On Stream!"
+	6. The bot will automatically deactivate when the quiz timer has expired. You can also manually deactivate it by typing in "!end" (streamer only) or clicking on "End" in the program.
 	
 	7. To begin a new round, once again, start the round on Aerolith before clicking on "Start" in the program (staying in the same room / table will eliminate the need to update it).
 	

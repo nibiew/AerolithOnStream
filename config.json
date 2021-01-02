@@ -4,5 +4,6 @@
     "channel": "Streamer",
 	"theme": "Dark Black",
 	"font": "Arial",
-	"colours": ["yellow", "black", "sandy brown"]
+	"colours": ["yellow", "black", "sandy brown"],
+	"box_height": [25, 5, 5]
 }
