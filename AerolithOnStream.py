@@ -27,13 +27,11 @@ def loadingComplete(line):
         return True
 
 def getUser(line):
-    global user
     separate = line.split(":", 2) #split by colon, up to two times
     user = separate[1].split("!", 1)[0]
     return user
 
 def getMessage(line):
-    global message
     try:
         message = line.split(":", 2)[2] #split by colon, up to two times
     except:
@@ -74,7 +72,6 @@ def twitch():
                     try:
                         pyautogui.typewrite(message)
                         pyautogui.press('enter')
-                        print(message)
                         if message in words:
                             window['-MESSAGES-' + sg.WRITE_ONLY_KEY].print(user + ": " + message, background_color='green')
                             solved.append(message)
@@ -85,12 +82,14 @@ def twitch():
                                 scores[user]+= 1
                             window['-SCORES-' + sg.WRITE_ONLY_KEY].update('')
                             rank = 1
-                            for u in sorted(scores, key=scores.get):
-                                if rank > len(scores)-3:
+                            scoresRank = sorted(scores, key=scores.get)
+                            for u in scoresRank:
+                                if rank > len(scores)-3: #add coloured ranks for top 3
                                     window['-SCORES-' + sg.WRITE_ONLY_KEY].print(u + ': ' + str(scores[u]), text_color=config.colours[len(scores) - rank]) #default is ["yellow", "black", "sandy brown"]
                                 else:
                                     window['-SCORES-' + sg.WRITE_ONLY_KEY].print(u + ': ' + str(scores[u]))
                                 rank += 1
+                            if not words: endGame('All words found!')
                         elif message.upper() in solved: #guessed before
                             window['-MESSAGES-' + sg.WRITE_ONLY_KEY].print(user + ": " + message, background_color='grey')
                         else: #wrong guess
@@ -100,25 +99,23 @@ def twitch():
                             else:
                                 badguess[user]+= 1
                             window['-BADGUESS-' + sg.WRITE_ONLY_KEY].update('')
-                            for u in sorted(badguess, key=badguess.get):
+                            badguessRank = sorted(badguess, key=badguess.get)
+                            for u in badguessRank:
                                 window['-BADGUESS-' + sg.WRITE_ONLY_KEY].print(u + ': ' + str(badguess[u]))
                     except:
                         print("There was some issue with this message: " + message)
 
-def gameControl():
-    while datetime.datetime.now() < endtime:
-        continue    
-    started = False
-    if len(scores)>0:
-        finalRanks = 'Leaderboard - '
-        for i in range(0, min(5, len(scores))):
+def endGame(msgToSend):
+    global started
+    if started: #do nothing if started is false
+        finalRanks = ' Leaderboard - '
+        for i in range(min(5, len(scores))):
             user = sorted(scores, key=scores.get, reverse=True)[i]
             finalRanks += str(i+1) + '. @' + user + ': ' + str(scores[user]) + ' '
-        sendMessage(irc, "Round over! " + finalRanks)
-    else:
-        sendMessage(irc, "Round over! No answers found.")
-    window['-OUTPUT-'].update('Aerolith On Stream is not running.', text_color='white')
-
+        sendMessage(irc, msgToSend + finalRanks)
+        window['-OUTPUT-'].update('Aerolith On Stream is not running.', text_color='white')
+    started = False
+    
 config = cf.config()
 SERVER = "irc.twitch.tv"
 PORT = 6667
@@ -151,7 +148,6 @@ layout = [[sg.Text('Bot has not joined the channel.',size=(40,1), key='-BOTSTATU
     [sg.Button('Start', font = config.font), sg.Button('End', font = config.font)]]
 
 # Create the window
-global window
 window = sg.Window('Aerolith On Stream', layout, finalize=True)
 joinChat()
 irc.setblocking(False)
@@ -161,7 +157,6 @@ t1.start()
 
 # Display and interact with the Window using an Event Loop
 while True:
-    global event, values
     event, values = window.read()
     # See if user wants to quit or window was closed
     if event == sg.WINDOW_CLOSED:
@@ -192,7 +187,6 @@ while True:
         blank = any('?' in string for string in alpha) #checks if this is a blank quiz
         blank_length = len(alpha[0]) #get length of first alphagram for blank quizzes
         alpha = [s.replace('?', '') for s in alpha]
-        endtime = datetime.datetime.now() + datetime.timedelta(seconds = float(time))
         window['-OUTPUT-'].update('Aerolith On Stream has started!', text_color = 'red')
         sendMessage(irc, "Starting Aerolith On Stream!")
         solved = []
@@ -203,11 +197,9 @@ while True:
             badguess = {}
             window['-SCORES-' + sg.WRITE_ONLY_KEY].update('')
             window['-BADGUESS-' + sg.WRITE_ONLY_KEY].update('')
-        t2 = threading.Thread(target = gameControl)
+        t2 = threading.Timer(float(time), endGame, ["Time's up!"])
         t2.start()
     elif event == 'End':
-        started = False
-        sendMessage(irc, "Ending Aerolith On Stream!")
-        window['-OUTPUT-'].update('Aerolith On Stream is not running.', text_color='white')
+        endGame('Game ended by streamer!')
 # Finish up by removing from the screen
 window.close()
