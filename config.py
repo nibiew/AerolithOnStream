@@ -5,6 +5,7 @@ def json_decoder(obj):
                     obj['nick'],
                     obj['channel'],
                     obj['theme'],
+                    obj['input_background'],
                     obj['font'],
                     obj['colours'],
                     obj['box_height']
@@ -13,11 +14,12 @@ def json_decoder(obj):
         return obj
       
 class Config:
-    def __init__(self,irc_token,nick,channel,theme,font,colours,box_height):
+    def __init__(self,irc_token,nick,channel,theme,input_background,font,colours,box_height):
        self.irc_token = irc_token
        self.nick = nick
        self.channel = channel
        self.theme = theme
+       self.input_background = input_background
        self.font = font
        self.colours = colours
        self.box_height = box_height

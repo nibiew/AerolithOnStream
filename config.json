@@ -3,7 +3,8 @@
 	"nick": "BotAccount",
     "channel": "Streamer",
 	"theme": "Dark Black",
+	"input_background": "#16161d",
 	"font": "Arial",
-	"colours": ["yellow", "black", "sandy brown"],
+	"colours": ["yellow", "#bdb7ab", "sandy brown"],
 	"box_height": [25, 5, 5]
 }

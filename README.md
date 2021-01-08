@@ -11,13 +11,14 @@ A basic Twitch bot that relies on PyAutoGUI to run Aerolith (https://www.aerolit
 			"nick": "BotAccount",
 			"channel": "Streamer",
 			"theme": "Dark Black",
+			"input_background": "#16161d",
 			"font": "Arial",
-			"colours": ["yellow", "black", "sandy brown"],
+			"colours": ["yellow", "#bdb7ab", "sandy brown"],
 			"box_height": [25, 5, 5]
 		}
     
 ### Setting up your own bot
-Instructions adapted from https://github.com/danibarker/TwitchBot. You can run AerolithOnStream.py if you have python, or the exe if you don't.
+Instructions adapted from https://github.com/danibarker/TwitchBot (the most awesome Scrabble bot in existence!) You can run AerolithOnStream.py if you have python, or the exe if you don't.
 
   	1. Create a new Twitch account with the username you want the bot to have and log in.
 
@@ -29,9 +30,10 @@ Instructions adapted from https://github.com/danibarker/TwitchBot. You can run A
 	  	nick is your bot's username
 	  	channel is your stream channel
 		theme is your preferred theme (default is Dark Black - you can select your favourite at https://pysimplegui.readthedocs.io/en/latest/cookbook/#themes-window-beautification)
+		input_background is the colour of the box showing the guesses and scores
 		font is your preferred font
 		colours are your preferred three colours for the top three positions - you may refer to https://github.com/PySimpleGUI/PySimpleGUI/blob/master/DemoPrograms/Demo_Color_Names_Smaller_List.py for colour names or use hex codes
-		box_height are your preferred number of rows to show for guesses, correct and wrong answers.
+		box_height are your preferred number of rows to show for guesses, correct answers and wrong answers.
 
   	4. That's it, run AerolithOnStream.exe or AerolithOnStream.py and you should see a message on the console saying "Bot <Bot's nick> has joined the channel <Streamer>!"
     

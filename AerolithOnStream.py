@@ -43,6 +43,7 @@ def sendMessage(irc, message):
     irc.send((messageTemp + "\n").encode())
 
 def twitch():
+    global scoresRank
     while True:
         try:
             received = irc.recv(1024)
@@ -73,7 +74,7 @@ def twitch():
                         pyautogui.typewrite(message)
                         pyautogui.press('enter')
                         if message in words:
-                            window['-MESSAGES-' + sg.WRITE_ONLY_KEY].print(user + ": " + message, background_color='green')
+                            window['-MESSAGES-' + sg.WRITE_ONLY_KEY].print(f"{user}: {message}", background_color='green')
                             solved.append(message)
                             if message in words: words.remove(message) #if statement added to reduce crashes
                             if not user in scores:
@@ -82,36 +83,38 @@ def twitch():
                                 scores[user]+= 1
                             window['-SCORES-' + sg.WRITE_ONLY_KEY].update('')
                             rank = 1
-                            scoresRank = sorted(scores, key=scores.get)
+                            scoresRank = sorted(scores, key=scores.get, reverse=True)
                             for u in scoresRank:
-                                if rank > len(scores)-3: #add coloured ranks for top 3
-                                    window['-SCORES-' + sg.WRITE_ONLY_KEY].print(u + ': ' + str(scores[u]), text_color=config.colours[len(scores) - rank]) #default is ["yellow", "black", "sandy brown"]
+                                if rank <= 3: #add coloured ranks for top 3
+                                    window['-SCORES-' + sg.WRITE_ONLY_KEY].print(f"{u}: {str(scores[u])}", text_color=config.colours[rank-1]) #default is ["yellow", "#bdb7ab", "sandy brown"]
                                 else:
-                                    window['-SCORES-' + sg.WRITE_ONLY_KEY].print(u + ': ' + str(scores[u]))
+                                    window['-SCORES-' + sg.WRITE_ONLY_KEY].print(f"{u}: {str(scores[u])}")
                                 rank += 1
+                            window['-SCORES-' + sg.WRITE_ONLY_KEY].Widget.yview_moveto(0) #move to start
                             if not words: endGame('All words found!')
                         elif message.upper() in solved: #guessed before
-                            window['-MESSAGES-' + sg.WRITE_ONLY_KEY].print(user + ": " + message, background_color='grey')
+                            window['-MESSAGES-' + sg.WRITE_ONLY_KEY].print(f"{user}: {message}", background_color='grey')
                         else: #wrong guess
-                            window['-MESSAGES-' + sg.WRITE_ONLY_KEY].print(user + ": " + message, background_color='red')
+                            window['-MESSAGES-' + sg.WRITE_ONLY_KEY].print(f"{user}: {message}", background_color='red')
                             if not user in badguess:
                                 badguess[user] = 1
                             else:
                                 badguess[user]+= 1
                             window['-BADGUESS-' + sg.WRITE_ONLY_KEY].update('')
-                            badguessRank = sorted(badguess, key=badguess.get)
+                            badguessRank = sorted(badguess, key=badguess.get, reverse=True)
                             for u in badguessRank:
                                 window['-BADGUESS-' + sg.WRITE_ONLY_KEY].print(u + ': ' + str(badguess[u]))
+                            window['-BADGUESS-' + sg.WRITE_ONLY_KEY].Widget.yview_moveto(0) #move to start
                     except:
                         print("There was some issue with this message: " + message)
 
 def endGame(msgToSend):
-    global started
+    global started, scoresRank
     if started: #do nothing if started is false
         finalRanks = ' Leaderboard - '
         for i in range(min(5, len(scores))):
-            user = sorted(scores, key=scores.get, reverse=True)[i]
-            finalRanks += str(i+1) + '. @' + user + ': ' + str(scores[user]) + ' '
+            user = scoresRank[i]
+            finalRanks += f"{str(i+1)}. @{user}: {str(scores[user])} "
         sendMessage(irc, msgToSend + finalRanks)
         window['-OUTPUT-'].update('Aerolith On Stream is not running.', text_color='white')
     started = False
@@ -133,22 +136,24 @@ irc.send(("PASS " + config.irc_token + "\n" +
         "JOIN #" + config.channel + "\n").encode())
 
 sg.theme(config.theme) #default is Dark Black
+sg.theme_input_background_color(config.input_background)
 
 # Define the window's contents
 layout = [[sg.Text('Bot has not joined the channel.',size=(40,1), key='-BOTSTATUS-', font=config.font)], #default font is Arial
     [sg.Text('Aerolith On Stream is not running.', size=(40,2), key='-OUTPUT-', font = config.font)],
     [sg.Text('Guesses:', font = config.font)],
     [sg.MLine(size=(40,config.box_height[0]+1), disabled=True, key='-MESSAGES-' + sg.WRITE_ONLY_KEY, font = config.font)], #+1 to height because there is an empty line at the end
-    [sg.Text('Scoreboard:', font = config.font)],
+    [sg.Text('Leaderboard:', font = config.font)],
     [sg.MLine(size=(40,config.box_height[1]+1), disabled=True, key='-SCORES-'+ sg.WRITE_ONLY_KEY, font = config.font)], #+1 to height because there is an empty line at the end
     [sg.Text('Nopeboard:', font = config.font)],
     [sg.MLine(size=(40,config.box_height[2]+1), disabled=True, key='-BADGUESS-'+ sg.WRITE_ONLY_KEY, font = config.font)], #+1 to height because there is an empty line at the end
-    [sg.Text('Room Number', font = config.font), sg.InputText(key='-ROOM-', size=(8,1), font = config.font)], 
+    [sg.Text('Room Number', font = config.font), sg.InputText(key='-ROOM-', size=(8,1), font = config.font, enable_events=True)], 
     [sg.Checkbox('Retain scores across rounds', key='-SAVESCORE-', default=True, font = config.font)], 
     [sg.Button('Start', font = config.font), sg.Button('End', font = config.font)]]
 
 # Create the window
 window = sg.Window('Aerolith On Stream', layout, finalize=True)
+window.FindElement("-MESSAGES-" + sg.WRITE_ONLY_KEY).Autoscroll = False
 joinChat()
 irc.setblocking(False)
 
@@ -163,6 +168,8 @@ while True:
         islive=False
         print("window closed!")
         break
+    if event == '-ROOM-' and values['-ROOM-'] and values['-ROOM-'][-1] not in ('0123456789.'):
+        window['-ROOM-'].update(values['-ROOM-'][:-1])
     elif event == 'Start':
         try:
             room = int(values['-ROOM-'])
