@@ -9,6 +9,7 @@ import PySimpleGUI as sg
 import requests
 import json
 import datetime
+import time
 
 def joinChat():
     loading = True
@@ -42,6 +43,12 @@ def sendMessage(irc, message):
     messageTemp = "PRIVMSG #" + config.channel + " :" + message
     irc.send((messageTemp + "\n").encode())
 
+def containsAll(string1, string2): #longer string is string1
+    for c in string2:
+        if c not in string1: return False
+        string1 = string1.replace(c, '', 1)
+    return True
+
 def twitch():
     global scoresRank
     while True:
@@ -65,10 +72,13 @@ def twitch():
                 message = ''.join(message.split()).upper() #remove spaces
                 if started:
                     sortedMessage = ''.join(sorted(message))
-                    if not blank:
-                        if not sortedMessage in alpha: #wrong letters
+                    if blank:
+                        if len(message) != blank_length or not any(containsAll(sortedMessage, string) for string in alpha): #blank quiz - probably slower.
                             continue
-                    elif len(message) != blank_length or not any(containsAll(sortedMessage, string) for string in alpha): #blank quiz - probably slower.
+                    elif subword:
+                        if not containsAll(alpha[0], sortedMessage):
+                            continue
+                    elif not sortedMessage in alpha: #wrong letters
                         continue
                     try:
                         pyautogui.typewrite(message)
@@ -118,7 +128,15 @@ def endGame(msgToSend):
         sendMessage(irc, msgToSend + finalRanks)
         window['-OUTPUT-'].update('Aerolith On Stream is not running.', text_color='white')
     started = False
-    
+
+def shuffle():
+    global started
+    if started: #do nothing if started is false
+        if values['-SHUFFLE-']==True:
+            pyautogui.press('1')
+        time.sleep(10)
+        shuffle()
+
 config = cf.config()
 SERVER = "irc.twitch.tv"
 PORT = 6667
@@ -149,6 +167,7 @@ layout = [[sg.Text('Bot has not joined the channel.',size=(40,1), key='-BOTSTATU
     [sg.MLine(size=(40,config.box_height[2]+1), disabled=True, key='-BADGUESS-'+ sg.WRITE_ONLY_KEY, font = config.font)], #+1 to height because there is an empty line at the end
     [sg.Text('Room Number', font = config.font), sg.InputText(key='-ROOM-', size=(8,1), font = config.font, enable_events=True)], 
     [sg.Checkbox('Retain scores across rounds', key='-SAVESCORE-', default=True, font = config.font)], 
+    [sg.Checkbox('Shuffle letters every 10 seconds', key='-SHUFFLE-', default=False, font = config.font, enable_events=True)], 
     [sg.Button('Start', font = config.font), sg.Button('End', font = config.font)]]
 
 # Create the window
@@ -168,7 +187,7 @@ while True:
         islive=False
         print("window closed!")
         break
-    if event == '-ROOM-' and values['-ROOM-'] and values['-ROOM-'][-1] not in ('0123456789.'):
+    elif event == '-ROOM-' and values['-ROOM-'] and values['-ROOM-'][-1] not in ('0123456789.'):
         window['-ROOM-'].update(values['-ROOM-'][:-1])
     elif event == 'Start':
         try:
@@ -185,13 +204,14 @@ while True:
             sg.popup('Error!')
             continue
         data = json.loads(r.content)
-        time = data['time_remaining']
+        gameTime = data['time_remaining']
         alpha = []
         words = []
         for question in data['questions']:
             alpha.append(question['a'])
             words.extend(question['ws'])
         blank = any('?' in string for string in alpha) #checks if this is a blank quiz
+        subword = len(alpha)==1 and not all(len(x) == len(words[0]) for x in words) #checks if this is a subword quiz
         blank_length = len(alpha[0]) #get length of first alphagram for blank quizzes
         alpha = [s.replace('?', '') for s in alpha]
         window['-OUTPUT-'].update('Aerolith On Stream has started!', text_color = 'red')
@@ -204,8 +224,12 @@ while True:
             badguess = {}
             window['-SCORES-' + sg.WRITE_ONLY_KEY].update('')
             window['-BADGUESS-' + sg.WRITE_ONLY_KEY].update('')
-        t2 = threading.Timer(float(time), endGame, ["Time's up!"])
+        t2 = threading.Timer(float(gameTime), endGame, ["Time's up!"])
         t2.start()
+        t3 = threading.Timer(10, shuffle)
+        t3.start()
+    elif event == '-SHUFFLE-': #needed to update value so it can be read by shuffle thread.
+        print('Shuffle turned {status}.'.format(status='on' if values['-SHUFFLE-'] else 'off'))
     elif event == 'End':
         endGame('Game ended by streamer!')
 # Finish up by removing from the screen
