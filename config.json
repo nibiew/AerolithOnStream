@@ -1,7 +1,7 @@
 {
 	"irc_token": "oauth:ab2cefg45hika25mntu34dsffsa143v3",
-	"nick": "BotAccount",
-    "channel": "Streamer",
+	"nick": "bot_account",
+    "channel": "streamer",
 	"theme": "Dark Black",
 	"input_background": "#16161d",
 	"font": "Arial",

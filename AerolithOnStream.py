@@ -127,6 +127,8 @@ def endGame(msgToSend):
             finalRanks += f"{str(i+1)}. @{user}: {str(scores[user])} "
         sendMessage(irc, msgToSend + finalRanks)
         window['-OUTPUT-'].update('Aerolith On Stream is not running.', text_color='white')
+        if t2.is_alive():
+            t2.cancel() #cancel timer if it's still running
     started = False
 
 def shuffle():

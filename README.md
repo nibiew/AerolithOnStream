@@ -8,8 +8,8 @@ A basic Twitch bot that relies on PyAutoGUI to run Aerolith (https://www.aerolit
    
 		{
 			"irc_token": "oauth:ab2cefg45hika25mntu34dsffsa143v3",
-			"nick": "BotAccount",
-			"channel": "Streamer",
+			"nick": "bot_account",
+			"channel": "streamer",
 			"theme": "Dark Black",
 			"input_background": "#16161d",
 			"font": "Arial",
@@ -28,7 +28,7 @@ Instructions adapted from https://github.com/danibarker/TwitchBot (the most awes
 	  	
 		irc_token is the oauth, make sure it includes the text "oauth:" and not just the rest of the string
 	  	nick is your bot's username
-	  	channel is your stream channel
+	  	channel is your stream channel (in lowercase)
 		theme is your preferred theme (default is Dark Black - you can select your favourite at https://pysimplegui.readthedocs.io/en/latest/cookbook/#themes-window-beautification)
 		input_background is the colour of the box showing the guesses and scores
 		font is your preferred font
