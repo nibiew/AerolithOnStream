@@ -56,3 +56,5 @@ Instructions adapted from https://github.com/danibarker/TwitchBot (the most awes
 	7. To begin a new round, once again, start the round on Aerolith before clicking on "Start" in the program (staying in the same room / table will eliminate the need to update it).
 	
 	8. To clear the scoreboard and "nopeboard" in between rounds, uncheck "Retain scores across rounds" before clicking "Start" in the program.
+	
+	9. If you're playing Polish or Spanish Aerolith, you can check "Convert special characters into English letters" if you're using an English language keyboard, before starting the game. While Aerolith On Stream will record your guesses and score, your guesses with English letters will not be typed into Aerolith with the special characters.

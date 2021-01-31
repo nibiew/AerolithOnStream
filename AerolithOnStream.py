@@ -10,6 +10,7 @@ import requests
 import json
 import datetime
 import time
+import pyperclip
 
 def joinChat():
     loading = True
@@ -44,9 +45,20 @@ def sendMessage(irc, message):
     irc.send((messageTemp + "\n").encode())
 
 def containsAll(string1, string2): #longer string is string1
-    for c in string2:
-        if c not in string1: return False
-        string1 = string1.replace(c, '', 1)
+    a = sorted(string1) # this is just an array of single-char strings like ['e', 'h', 'l', 'l', 'o']
+    b = sorted(string2) # also it's likely you can pre-sort most
+    ai = 0
+    bi = 0
+    while ai < len(a) and bi < len(b):
+      if a[ai] == b[bi]:
+        ai += 1
+        bi += 1
+      elif a[ai] < b[bi]:
+        ai += 1 # a can be longer
+      else:
+        return False # b cannot be longer
+    if bi < len(b):
+      return False # something extra in b
     return True
 
 def twitch():
@@ -70,6 +82,10 @@ def twitch():
                 message = getMessage(line)
                 print(user + ": " + message) #useful for debugging purposes
                 message = ''.join(message.split()).upper() #remove spaces
+                if values['-CONVERT-']==True:
+                    message = message.translate(str.maketrans('ñąćęłńóśźżÑĄĆĘŁŃÓŚŹŻ', 'NACELNOSZZNACELNOSZZ')) #change to english language characters
+                else:
+                    message = message.translate(str.maketrans('ñąćęłńóśźż', 'ÑĄĆĘŁŃÓŚŹŻ')) #change to upper case characters
                 if started:
                     sortedMessage = ''.join(sorted(message))
                     if blank:
@@ -81,7 +97,11 @@ def twitch():
                     elif not sortedMessage in alpha: #wrong letters
                         continue
                     try:
-                        pyautogui.typewrite(message)
+                        if polish or spanish:
+                            pyperclip.copy(message)
+                            pyautogui.hotkey('ctrl', 'v')
+                        else:
+                            pyautogui.typewrite(message) #should be faster?
                         pyautogui.press('enter')
                         if message in words:
                             window['-MESSAGES-' + sg.WRITE_ONLY_KEY].print(f"{user}: {message}", background_color='green')
@@ -170,6 +190,7 @@ layout = [[sg.Text('Bot has not joined the channel.',size=(40,1), key='-BOTSTATU
     [sg.Text('Room Number', font = config.font), sg.InputText(key='-ROOM-', size=(8,1), font = config.font, enable_events=True)], 
     [sg.Checkbox('Retain scores across rounds', key='-SAVESCORE-', default=True, font = config.font)], 
     [sg.Checkbox('Shuffle letters every 10 seconds', key='-SHUFFLE-', default=False, font = config.font, enable_events=True)], 
+    [sg.Checkbox('Convert special characters into English letters', key='-CONVERT-', default=False, font = config.font, enable_events=True)], 
     [sg.Button('Start', font = config.font), sg.Button('End', font = config.font)]]
 
 # Create the window
@@ -213,6 +234,18 @@ while True:
             alpha.append(question['a'])
             words.extend(question['ws'])
         blank = any('?' in string for string in alpha) #checks if this is a blank quiz
+        polish = any(any(elem in string for elem in 'ĄĆĘŁŃÓŚŹŻ') for string in alpha) #checks if this is a polish quiz
+        spanish = any(any(elem in string for elem in '123Ñ') for string in alpha) #checks if this is a spanish quiz
+        if values['-CONVERT-']==True:
+            alpha = [sub.translate(str.maketrans('ÑĄĆĘŁŃÓŚŹŻ', 'NACELNOSZZ')) for sub in alpha] 
+            words = [sub.translate(str.maketrans('ÑĄĆĘŁŃÓŚŹŻ', 'NACELNOSZZ')) for sub in words] 
+        if spanish:
+            dictionary = {"1": "CH", "2": "LL", "3": "RR"}
+            alpha = [sub.translate(str.maketrans(dictionary)) for sub in alpha]
+            alpha = [''.join(sorted(s)) for s in alpha] #sorting for CH
+            words = [sub.translate(str.maketrans(dictionary)) for sub in words] 
+        if polish:
+            alpha = [''.join(sorted(s)) for s in alpha] #sorting special language characters
         subword = len(alpha)==1 and not all(len(x) == len(words[0]) for x in words) #checks if this is a subword quiz
         blank_length = len(alpha[0]) #get length of first alphagram for blank quizzes
         alpha = [s.replace('?', '') for s in alpha]
@@ -232,6 +265,8 @@ while True:
         t3.start()
     elif event == '-SHUFFLE-': #needed to update value so it can be read by shuffle thread.
         print('Shuffle turned {status}.'.format(status='on' if values['-SHUFFLE-'] else 'off'))
+    elif event == '-CONVERT-': #needed to update value so it can be read by shuffle thread.
+        print('Conversion of special language characters into English characters turned {status}.'.format(status='on' if values['-CONVERT-'] else 'off'))
     elif event == 'End':
         endGame('Game ended by streamer!')
 # Finish up by removing from the screen
