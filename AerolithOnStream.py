@@ -82,7 +82,7 @@ def twitch():
                 message = getMessage(line)
                 print(user + ": " + message) #useful for debugging purposes
                 message = ''.join(message.split()).upper() #remove spaces
-                if values['-CONVERT-']==True:
+                if convert==True:
                     message = message.translate(str.maketrans('ñąćęłńóśźżÑĄĆĘŁŃÓŚŹŻ', 'NACELNOSZZNACELNOSZZ')) #change to english language characters
                 else:
                     message = message.translate(str.maketrans('ñąćęłńóśźż', 'ÑĄĆĘŁŃÓŚŹŻ')) #change to upper case characters
@@ -139,7 +139,7 @@ def twitch():
                         print("There was some issue with this message: " + message)
 
 def endGame(msgToSend):
-    global started, scoresRank
+    global started, scoresRank, t2
     if started: #do nothing if started is false
         finalRanks = ' Leaderboard - '
         for i in range(min(5, len(scores))):
@@ -152,7 +152,7 @@ def endGame(msgToSend):
     started = False
 
 def shuffle():
-    global started
+    global started, convert
     if started: #do nothing if started is false
         if values['-SHUFFLE-']==True:
             pyautogui.press('1')
@@ -166,6 +166,7 @@ PORT = 6667
 scores = {}
 badguess = {}
 started = False
+convert = False
 endtime = datetime.datetime.now()
 
 #Enter your twitch username and oauth-key below, and the app connects to twitch with the details.
@@ -238,7 +239,7 @@ while True:
         spanish = any(any(elem in string for elem in '123Ñ') for string in alpha) #checks if this is a spanish quiz
         if values['-CONVERT-']==True:
             alpha = [sub.translate(str.maketrans('ÑĄĆĘŁŃÓŚŹŻ', 'NACELNOSZZ')) for sub in alpha] 
-            words = [sub.translate(str.maketrans('ÑĄĆĘŁŃÓŚŹŻ', 'NACELNOSZZ')) for sub in words] 
+            words = [sub.translate(str.maketrans('ÑĄĆĘŁŃÓŚŹŻ', 'NACELNOSZZ')) for sub in words]
         if spanish:
             dictionary = {"1": "CH", "2": "LL", "3": "RR"}
             alpha = [sub.translate(str.maketrans(dictionary)) for sub in alpha]
@@ -266,6 +267,7 @@ while True:
     elif event == '-SHUFFLE-': #needed to update value so it can be read by shuffle thread.
         print('Shuffle turned {status}.'.format(status='on' if values['-SHUFFLE-'] else 'off'))
     elif event == '-CONVERT-': #needed to update value so it can be read by shuffle thread.
+        convert = not convert
         print('Conversion of special language characters into English characters turned {status}.'.format(status='on' if values['-CONVERT-'] else 'off'))
     elif event == 'End':
         endGame('Game ended by streamer!')
